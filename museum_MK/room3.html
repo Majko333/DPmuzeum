@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Virtual Museum - Special Exhibition Room</title>
+    <meta name="description" content="HCPortal Virtual Museum Special Exhibition Room">
+    <!--    basic A-FRAME lib -->
+    <script src="vendor/aframe/1.1.0/aframe.min.js"></script>
+
+    <!--    camera movement-controls -->
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+    <!--    TEXT AREAS on walls -->
+    <script src="vendor/troika/0.6.0/aframe-troika-text.min.js"></script>
+
+    <!-- PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.0.943/pdf.min.js"></script>
+
+
+    <script>
+
+        var myState = {
+            pdf: null,
+            currentPage: 1,
+            usedObject: "#pdf1",
+            usedCanvas : "pdf_renderer1",
+            zoom: 5
+        };
+
+        var myState2 = {
+            pdf: null,
+            currentPage: 1,
+            usedObject: "#pdf2",
+            usedCanvas : "pdf_renderer2",
+            zoom: 5
+        };
+
+        var myState3 = {
+            pdf: null,
+            currentPage: 1,
+            usedObject: "#pdf3",
+            usedCanvas : "pdf_renderer3",
+            zoom: 5
+        };
+
+        AFRAME.registerComponent('interactive', {
+            init: function () {
+                var el = this.el;
+                el.addEventListener('click', function () {
+                    window.location.replace('index.html');
+                });
+            }
+        });
+
+        var sceneEl = document.querySelector('a-scene');
+        var myObj;
+        var ajax = new XMLHttpRequest();
+        var method = "GET";
+        var id = "<?php echo $_GET[\"id\"]; ?>"
+        var url = "api/rest/getExhibitionItems.php?id=" + id;
+        var asynchronous = true;
+
+        ajax.open(method, url, asynchronous);
+
+        //send ajax request
+        ajax.send();
+
+        var suradnice = 3.00;
+        var counter = 1;
+
+        function pdfReader(obj){
+            if(obj.item_number === "11"){
+//             console.log("Dostanem sa sem 11");
+                AFRAME.registerComponent('render-pdf', {
+                    init: function () {
+
+                        pdfjsLib.getDocument(obj.file)
+                            .promise.then(doc => {
+                            console.log("this file has" + doc._pdfInfo.numPages + "pages");
+                            myState.pdf = doc;
+                            render(myState);
+                        });
+                    }
+                });
+            }
+            if(obj.item_number === "12"){
+//             console.log("Dostanem sa sem 12");
+                AFRAME.registerComponent('render-pdf2', {
+                    init: function () {
+                        pdfjsLib.getDocument(obj.file)
+                            .promise.then(doc => {
+                            console.log("this file has" + doc._pdfInfo.numPages + "pages");
+                            myState2.pdf = doc;
+                            render(myState2);
+                        });
+
+                    }
+                });
+            }
+            if(obj.item_number === "13"){
+//             console.log("Dostanem sa sem 13");
+                AFRAME.registerComponent('render-pdf3', {
+                    init: function () {
+                        pdfjsLib.getDocument(obj.file)
+                            .promise.then(doc => {
+                            console.log("this file has" + doc._pdfInfo.numPages + "pages");
+                            myState3.pdf = doc;
+                            render(myState3);
+                        });
+
+                    }
+                });
+            }
+        }
+
+
+        //receiving response from returnInfo.php
+        ajax.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                if(this.responseText== null){
+                    return;
+                }
+                console.log(this.responseText);
+                myObj = JSON.parse(this.responseText);
+                dlzka = Object.keys(myObj.length);
+                console.log(myObj);
+                for (var i = 0; i < myObj.length; i++) {
+                    var obj = myObj[i];
+                    if (obj !== null && obj.item_number < 11) {
+                        console.log(obj);
+                        var itemName = "item" + obj.item_number;
+                        var itemText = "text" + obj.item_number;
+                        var item = sceneEl.querySelector("#" + itemName);
+                        var text = sceneEl.querySelector("#" + itemText);
+                        item.setAttribute('src', obj.file);
+
+                        var rawFile = new XMLHttpRequest();
+                        var allText = "";
+                        var yesText = "";
+                        rawFile.open("GET", obj.description, false);
+                        rawFile.onreadystatechange = function () {
+                            if (rawFile.readyState === 4) {
+                                if (rawFile.status === 200 || rawFile.status == 0) {
+                                    allText = rawFile.responseText;
+                                    yesText = allText.substring(0, 500);
+                                }
+                            }
+                        };
+                        rawFile.send(null);
+                        text.setAttribute('troika-text', 'value', yesText);
+                    }else{
+                        pdfReader(obj);
+                    }
+                }
+
+            }
+        };
+
+        function render(myState) {
+            myState.pdf.getPage(myState.currentPage).then(page => {
+
+                var planeEl = document.querySelector(myState.usedObject);
+                var canvas = document.getElementById(myState.usedCanvas);
+                var ctx = canvas.getContext("2d");
+                var viewport = page.getViewport(myState.zoom);
+
+
+                console.log("height  " + viewport.height);
+                console.log("width" + viewport.width);
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+
+                var renderTask = page.render({
+                    canvasContext: ctx,
+                    viewport: viewport
+                });
+
+                renderTask.promise.then(function () {
+                    planeEl.getObject3D('mesh').material.map.needsUpdate = true;
+                });
+
+            });
+        }
+
+        document.querySelector('#markerDown1').addEventListener('click', function () {
+            if(myState.pdf == null|| myState.currentPage === 1)
+                return;
+            myState.currentPage -= 1;
+            document.querySelector('#currentPage1').setAttribute('troika-text', 'value: '+ myState.currentPage);
+            render(myState);
+        });
+
+        document.querySelector('#markerUp1').addEventListener('click', function () {
+            if(myState.pdf == null || myState.currentPage > myState.pdf._pdfInfo.numPages)
+                return;
+            myState.currentPage += 1;
+            document.querySelector('#currentPage1').setAttribute('troika-text', 'value: '+ myState.currentPage);
+            render(myState);
+        });
+
+        document.querySelector('#markerDown2').addEventListener('click', function () {
+            if(myState2.pdf == null|| myState2.currentPage === 1)
+                return;
+            myState2.currentPage -= 1;
+            document.querySelector('#currentPage2').setAttribute('troika-text', 'value: '+ myState2.currentPage);
+            render(myState2);
+        });
+
+        document.querySelector('#markerUp2').addEventListener('click', function () {
+            if(myState2.pdf == null || myState2.currentPage > myState2.pdf._pdfInfo.numPages)
+                return;
+            myState2.currentPage += 1;
+            document.querySelector('#currentPage2').setAttribute('troika-text', 'value: '+ myState2.currentPage);
+            render(myState2);
+        });
+
+        document.querySelector('#markerDown3').addEventListener('click', function () {
+            if(myState3.pdf == null|| myState3.currentPage === 1)
+                return;
+            myState3.currentPage -= 1;
+            document.querySelector('#currentPage3').setAttribute('troika-text', 'value: '+ myState3.currentPage);
+            render(myState3);
+        });
+
+        document.querySelector('#markerUp3').addEventListener('click', function () {
+            if(myState3.pdf == null || myState3.currentPage > myState3.pdf._pdfInfo.numPages)
+                return;
+            myState3.currentPage += 1;
+            document.querySelector('#currentPage3').setAttribute('troika-text', 'value: '+ myState3.currentPage);
+            render(myState3);
+        });
+
+        document.querySelector('#videoControls').addEventListener('click', function () {
+            var myVideo = document.querySelector('#video1');
+            if(myVideo.paused) {
+                myVideo.play();
+            }else {
+                myVideo.pause();
+            }
+        });
+
+        document.querySelector('#videoControls2').addEventListener('click', function () {
+            var myVideo = document.querySelector('#video2');
+            if(myVideo.paused) {
+                myVideo.play();
+            }else {
+                myVideo.pause();
+            }
+        });
+
+    </script>
+</head>
+
+
+<body>
+
+
+<a-scene preloader="slowLoad: true" shadow="autoUpdate: true" cursor="rayOrigin: mouse" render-pdf render-pdf2 render-pdf3>
+
+    <a-assets>
+        <img id="wall" src="museum/assets/general/wall.jpg">
+        <img id="wall-NRM" src="museum/assets/general/wall-NRM.jpg">
+        <img id="floor" src="museum/assets/general/floor.jpg">
+        <img id="floor-NRM" src="museum/assets/general/floor_NRM.jpg">
+        <img id="sky" src="museum/assets/general/sky.jpg">
+
+        <a-asset-items id="obj" src="museum/assets/models/hand/gear_vr_controller.obj" preload="auto"></a-asset-items>
+        <a-asset-items id="mtl" src="museum/assets/models/hand/gear_vr_controller.mtl" preload="auto"></a-asset-items>
+        <a-asset-items id="door" src="museum/assets/models/door/scene.gltf" preload="auto"></a-asset-items>
+        <a-asset-items id="kiosk" src="museum/assets/models/interactive_kiosk/scene.gltf" preload="auto"></a-asset-items>
+        <a-asset-item id="frame" src="museum/assets/models/frame.gltf"></a-asset-item>
+        <a-asset-items id="projector" src="museum/assets/models/projector/scene1.gltf"></a-asset-items>
+        <a-asset-items id="button" src="museum/assets/models/button.gltf"></a-asset-items>
+
+        <img id="marker" src="museum/assets/general/icons/arrow_right.png">
+        <video id="video1"></video>
+        <video id="video2"></video>
+        <canvas id="pdf_renderer1"></canvas>
+        <canvas id="pdf_renderer2"></canvas>
+        <canvas id="pdf_renderer3"></canvas>
+        <!-- nav mesh-->
+        <a-asset-item id="main-navmesh" src="museum/assets/navmeshes/navmesh_room3.gltf"></a-asset-item>
+
+    </a-assets>
+
+
+    <!--navmesh-->
+    <a-entity  gltf-model="#main-navmesh" visible="false" nav-mesh></a-entity>
+    <!--navmesh-->
+
+    <!-- CAMERA-->
+<!--    <a-entity id="rig" position="1 1.6 -1" movement-controls mouse-cursor kinematic-body jump-ability>-->
+<!--        <a-entity camera look-controls="pointerLockEnabled: true;" position="0 1.6 0"></a-entity>-->
+<!--    </a-entity>-->
+
+    <a-entity id="camera-rig" position="0.5 0 -1" movement-controls="controls: cardboard, gamepad, keyboard, touch; constrainToNavMesh: true; speed: 0.4">
+        <a-entity camera id="head"  look-controls="pointerLockEnabled: true" position="0 1.6 0">
+<!--            <a-entity cursor-->
+<!--                      position="0 0 -1"-->
+<!--                      geometry="primitive: ring; radiusInner: 0.01; radiusOuter: 0.015"-->
+<!--                      material="color: black; shader: flat">-->
+<!--            </a-entity>-->
+            <a-cursor></a-cursor>
+        </a-entity>
+    </a-entity>
+
+
+
+    <!-- CAMERA-->
+
+    <!--WALLS-->
+    <a-box  src="#wall" repeat="1 1" normal-map="#wall-NRM" normal-texture-repeat="1 1" normal-scale="1 -1" roughness="0.3" position="-9.02686 2.144 -12.85811" rotation="0 90 0" scale="" material="" geometry="depth: 0.15; height: 4.355; width: 30"></a-box>
+    <a-box  src="#wall" repeat="1 1" normal-map="#wall-NRM" normal-texture-repeat="1 1" normal-scale="1 -1" roughness="0.3" position="1.03508 2.144 -27.78252" rotation="" scale="" material="" geometry="depth: 0.15; height: 4.355; width: 20"></a-box>
+    <a-box  src="#wall" repeat="1 1" normal-map="#wall-NRM" normal-texture-repeat="1 1" normal-scale="1 -1" roughness="0.3" position="10.82578 2.144 -12.8735" rotation="0 90 0" scale="" material="" geometry="depth: 0.15; height: 4.355; width: 30"></a-box>
+    <a-box  src="#wall" repeat="1 1" normal-map="#wall-NRM" normal-texture-repeat="1 1" normal-scale="1 -1" roughness="0.3" position="0.89951 2.144 2.16549" rotation="" scale="" material="" geometry="depth: 0.15; height: 4.355; width: 20"></a-box>
+
+    <a-box id="roof" position="0.91566 4.333 -12.83703"  src="#wall" repeat="1 1" normal-map="#wall-NRM" normal-texture-repeat="1 1" normal-scale="1 -1" roughness="0.3" geometry="depth: 30; height: 0.1; width: 20"></a-box>
+
+    <!--DOOR-->
+    <a-entity id="door" shadow="" gltf-model="#door" position="-8.96008 -0.01381 0.4384" rotation="0 90 0" scale="1.3 1.3 1"></a-entity>
+    <a-box id="openInteractiv" shadow=""  position="-8.85594 1.37736 -0.12904" rotation="0 90 0" scale="1.06792 0.99134 -0.24479" material="opacity: 0; transparent: true" interactive></a-box>
+   
+    <!--ITEM1-->
+    <a-entity gltf-model="#frame" position="10.72801 -0.01169 -1.69394" rotation="-180 0 -180"></a-entity>
+    <a-image  id="item1" rotation="0 -90 0" position="10.71962 2.22091 -0.98638" material="" geometry="height: 1.76; width: 1.4"></a-image>
+    <a-troika-text color="black" id="text1" troika-text="letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 4; font: Roboto; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify" rotation="0 -90 0" position="10.71745 2.10293 -6.12803"></a-troika-text>
+    <!--ITEM1-->
+
+    <!--ITEM2-->
+    <a-entity gltf-model="#frame" position="10.72755 -0.012 -10.66642" rotation="180 0 180"></a-entity>
+    <a-image  id="item2" rotation="0 -90 0" position="10.71563 2.221 -9.95737" material="" geometry="width: 1.4; height: 1.76"></a-image>
+    <a-troika-text color="black" id="text2" troika-text="letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 4; font: Roboto; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify" rotation="0 -90 0" position="10.7442 2.0645 -15.13641"></a-troika-text>
+    <!--ITEM2-->
+
+    <!--ITEM3-->
+    <a-entity gltf-model="#frame" position="10.74568 -0.012 -19.11897" rotation="180 0 180"></a-entity>
+    <a-image  id="item3" rotation="0 -90 0" position="10.73857 2.221 -18.41689" material="" geometry="width: 1.4; height: 1.76"></a-image>
+    <a-troika-text color="black" id="text3" troika-text="letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 4; font: Roboto; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify" rotation="0 -90 0" position="10.71382 2.0645 -23.8085"></a-troika-text>
+    <!--ITEM3-->
+
+    <!--ITEM4-->
+    <a-entity gltf-model="#frame" position="3.49941 -0.012 -27.70564" rotation="0 -90 0"></a-entity>
+    <a-image  id="item4" rotation="" position="4.20906 2.21724 -27.69298" material="" geometry="height: 1.76; width: 1.4"></a-image>
+    <a-troika-text color="black" id="text4" troika-text="letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 4; font: Roboto; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify" rotation="" position="5.77254 2.12513 -27.68841"></a-troika-text>
+    <!--ITEM4-->
+
+    <!--ITEM5-->
+    <a-entity gltf-model="#frame" position="-8.93177 -0.012 -18.91236" rotation=""></a-entity>
+    <a-image  id="item5" rotation="0 90 0" position="-8.92131 2.22185 -19.62483" material="" geometry="height: 1.76; width: 1.4"></a-image>
+    <a-troika-text color="black" id="text5" troika-text="letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 4; font: Roboto; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify" rotation="0 90 0" position="-8.94242 2.15048 -21.28976"></a-troika-text>
+    <!--ITEM5-->
+
+    <!--ITEM6-->
+    <a-entity gltf-model="#frame" position="-8.92668 -0.012 -10.35732" rotation=""></a-entity>
+    <a-image  id="item6" rotation="0 90 0" position="-8.91913 2.22185 -11.06915" material="" geometry="height: 1.76; width: 1.4"></a-image>
+    <a-troika-text color="black" id="text6" troika-text="letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 4; font: Roboto; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify" rotation="0 90 0" position="-8.93051 2.162 -12.66932"></a-troika-text>
+    <!--ITEM6-->
+
+    <!--ITEM7-->
+    <a-entity gltf-model="#frame" position="-8.94833 -0.012 -2.18506" rotation=""></a-entity>
+    <a-image  id="item7" rotation="0 90 0" position="-8.94068 2.21996 -2.89203" material="" geometry="height: 1.76; width: 1.4"></a-image>
+    <a-troika-text color="black" id="text7" troika-text="letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 4; font: Roboto; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify" rotation="0 90 0" position="-8.93287 2.16204 -4.24919"></a-troika-text>
+    <!--ITEM7-->
+
+    <!--ITEM8-->
+    <a-entity gltf-model="#frame" position="-1.34767 -0.012 2.08201" rotation="0 90 0"></a-entity>
+    <a-image  id="item8" rotation="0 180 0" position="-2.05638 2.2191 2.06808" material="" geometry="height: 1.76; width: 1.4"></a-image>
+    <a-troika-text color="black" id="text8" troika-text="letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 4; font: Roboto; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify" rotation="0 180 0" position="-3.32875 2.16376 2.07583"></a-troika-text>
+    <!--ITEM8-->
+
+    <!--ITEMY-PREZENTACIA 9-->
+    <a-entity gltf-model="#projector" position="7.51704 0.66968 2.10209" scale="0.03 0.032 0.01" rotation="-179.9998479605043 0 -179.9998479605043"></a-entity>
+    <a-video src="#video1" position="7.39299 2.16836 2.03963" material="" geometry="width: 5; height: 2.5" rotation="0 180 0"></a-video>
+    <a-entity gltf-model="#button" id="videoControls" position="4.37316 1.7012 2.08704" scale="0.2 0.2 0.1" rotation="-180 0 -180" play-pause=""></a-entity>
+    <a-troika-text color="black" id="text9" troika-text="letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 3; font: Roboto; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify" rotation="0 180 0" position="3.97631 2.17907 2.05933"></a-troika-text>    <!--ITEMY-PREZENTACIA-->
+    <!--ITEMY-PREZENTACIA 9-->
+
+    <!--ITEMY-PREZENTACIA 10-->
+    <a-entity gltf-model="#projector" position="-4.91105 0.67 -27.69635" scale="0.03 0.032 0.01" rotation=""></a-entity>
+    <a-video src="#video2" position="-4.75554 2.16836 -27.63039" material="" geometry="width: 5; height: 2.5" rotation=""></a-video>
+    <a-entity gltf-model="#button" id="videoControls2" position="-1.75032 1.701 -27.69842" scale="0.2 0.2 0.1" rotation="" play-pause=""></a-entity>
+    <a-troika-text color="black" id="text10" troika-text="letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 3; font: Roboto; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify" rotation="" position="-1.25745 2.10605 -27.64433"></a-troika-text>
+    <!--ITEMY-PREZENTACIA 10-->
+
+    <!--PDF1-->
+    <a-entity id="kiosk"  gltf-model="#kiosk" position="1.07908 -1.72651 -4.47078" rotation="" scale="0.2 0.2 0.2"></a-entity>
+    <a-entity id="pdf1" geometry="primitive: plane; height: 1.88; width: 1.15" position="1.08029 1.775 -4.234" material="src: #pdf_renderer1"></a-entity>
+    <a-box id="block" shadow=""  position="1.09673 1.34623 -4.71936" rotation="0 90 0" scale="0.09278 2.11912 -1.05479" material="opacity: 0; transparent: true"></a-box>
+    <a-image id="markerUp1" src="#marker" rotation="" position="1.77277 1.81607 -4.228" scale="0.1 0.1 0.1"></a-image>
+    <a-image id="markerDown1" src="#marker" rotation="0 0 179.9998479605043" position="0.40263 1.816 -4.22792" scale="0.1 0.1 0.1"></a-image>
+    <a-troika-text color="black" id="currentPage1" troika-text="value: 1; letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 3; font: Roboto; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify" rotation="" position="1.04033 2.84756 -4.22747"></a-troika-text>
+    <!--PDF1-->
+
+    <!--PDF2-->
+    <a-entity id="kiosk" gltf-model="#kiosk" position="1.07908 -1.72651 -10.85231" rotation="" scale="0.2 0.2 0.2"></a-entity>
+    <a-entity id="pdf2" geometry="primitive: plane; height: 1.88; width: 1.15" position="1.08029 1.775 -10.61258" material="src: #pdf_renderer2"></a-entity>
+    <a-box id="block" shadow=""  position="1.09673 1.34623 -11.10587" rotation="0 90 0" scale="0.09278 2.11912 -1.05479" material="opacity: 0; transparent: true"></a-box>
+    <a-image id="markerUp2" src="#marker" rotation="" position="1.77277 1.81607 -10.59945" scale="0.1 0.1 0.1"></a-image>
+    <a-image id="markerDown2" src="#marker" rotation="0 0 179.9998479605043" position="0.40263 1.816 -10.599" scale="0.1 0.1 0.1"></a-image>
+    <a-troika-text color="black" id="currentPage2" troika-text="value: 1; letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 3; font: Roboto; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify" rotation="" position="1.04033 2.84756 -10.607"></a-troika-text>
+    <!--PDF2-->
+
+    <!--PDF3-->
+    <a-entity id="kiosk" gltf-model="#kiosk" position="1.07908 -1.72651 -18.25562" rotation="" scale="0.2 0.2 0.2"></a-entity>
+    <a-entity id="pdf3" geometry="primitive: plane; height: 1.88; width: 1.15" position="1.08029 1.775 -18.01247" material="src: #pdf_renderer3"></a-entity>
+    <a-box id="block" shadow=""  position="1.09673 1.34623 -18.50347" rotation="0 90 0" scale="0.09278 2.11912 -1.05479" material="opacity: 0; transparent: true"></a-box>
+    <a-image id="markerUp3" src="#marker" rotation="" position="1.77277 1.81607 -18.01002" scale="0.1 0.1 0.1"></a-image>
+    <a-image id="markerDown3" src="#marker" rotation="0 0 179.9998479605043" position="0.40263 1.816 -18.01244" scale="0.1 0.1 0.1"></a-image>
+    <a-troika-text color="black" id="currentPage3" troika-text="value: 1; letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 3; font: Roboto; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify" rotation="" position="1.04033 2.84756 -18.01236"></a-troika-text>
+    <!--PDF3-->
+
+
+    <a-plane  position="0.954 0.0363 -9.772" src="#floor" repeat="6 3" normal-map="#floor-NRM" normal-texture-repeat="1 1" normal-scale="1 -1" roughness="0.3" rotation="-90 0 0" width="20" height="25" material="" geometry="width: 30; height: 40" ></a-plane>
+    <a-sky src="#sky"></a-sky>
+
+    <!--LIGHT-->
+    <a-entity light="type : ambient; intensity: 1.1; castShadows: true"></a-entity>
+    <a-entity light="castShadow: true; intensity: 0.4" position="2.03218 13.8244 -1.34995"></a-entity>
+    <!--LIGHT-->
+
+</a-scene>
+</body>
+
+
+
+</html>
