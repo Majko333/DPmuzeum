@@ -18,7 +18,7 @@
     <script>
 
         var myState = {
-            pdf: null,
+            pdf: "museum_MK/museum/assets/general/pdfs/link 2000 1.pdf",
             currentPage: 1,
             usedObject: "#pdf1",
             usedCanvas : "pdf_renderer1",
@@ -431,20 +431,24 @@
 
     <!--ROOM AREA CONSTRAINT-->
     <a-plane id="navmesh-el" position="0 0 0" rotation="-90 0 0" src="#floor" normal-map="#floor-NRM" normal-texture-repeat="1 1" normal-scale="1 -1" roughness="0.3" width="10" height="10" visible="false"></a-plane>
-        <!--FLOOR CONSTRAINT-->
-        <a-plane rotation="-90 0 0" width="1.5" height="0.6" class="navmesh-hole" visible="false" material="" geometry=""></a-plane>
-    <!--FLOOR-->
-    <a-plane id="floor" position="" rotation="-90 0 0" src="#floor" normal-map="#floor-NRM" normal-texture-repeat="1 1" normal-scale="1 -1" roughness="0.3" width="10" height="10" material="" geometry="width: 20; height: 20" visible=""></a-plane>
+    <!--FLOOR CONSTRAINT-->
+    <a-plane rotation="-90 0 0" width="1.5" height="0.6" class="navmesh-hole" visible="false" material="" geometry=""></a-plane>
+    
+    <!--BUILDING-->      
+    <a-entity>
+        <!--FLOOR-->
+        <a-plane id="floor" position="" rotation="-90 0 0" src="#floor" normal-map="#floor-NRM" normal-texture-repeat="1 1" normal-scale="1 -1" roughness="0.3" width="10" height="10" material="" geometry="width: 20; height: 20" visible=""></a-plane>
 
-    <!--WALLS-->
-    <a-box src="#wall" repeat="1 1" normal-map="#wall-NRM" normal-texture-repeat="1 1" normal-scale="1 -1" roughness="0.3" position="5 2 0" rotation="0 90 0" scale="" material="" geometry="depth: 0.1; height: 4; width: 10" visible="true" id="wall1"></a-box>
-    <a-box src="#wall" repeat="1 1" normal-map="#wall-NRM" normal-texture-repeat="1 1" normal-scale="1 -1" roughness="0.3" position="-5 2 0" rotation="0 90 0" scale="" material="" geometry="depth: 0.1; height: 4; width: 10" visible="" id="wall2"></a-box>
-    <a-box src="#wall" repeat="1 1" normal-map="#wall-NRM" normal-texture-repeat="1 1" normal-scale="1 -1" roughness="0.3" position="0 2 5" rotation="" scale="" material="" geometry="depth: 0.1; height: 4; width: 10" visible="" id="wall3"></a-box>
-    <a-box src="#wall" repeat="1 1" normal-map="#wall-NRM" normal-texture-repeat="1 1" normal-scale="1 -1" roughness="0.3" position="0 2 -5" rotation="" scale="" material="" geometry="depth: 0.1; height: 4; width: 10" visible="" id="wall4"></a-box>
+        <!--WALLS-->
+        <a-box src="#wall" repeat="1 1" normal-map="#wall-NRM" normal-texture-repeat="1 1" normal-scale="1 -1" roughness="0.3" position="5 2 0" rotation="0 90 0" scale="" material="" geometry="depth: 0.1; height: 4; width: 10" visible="true" id="wall1"></a-box>
+        <a-box src="#wall" repeat="1 1" normal-map="#wall-NRM" normal-texture-repeat="1 1" normal-scale="1 -1" roughness="0.3" position="-5 2 0" rotation="0 90 0" scale="" material="" geometry="depth: 0.1; height: 4; width: 10" visible="" id="wall2"></a-box>
+        <a-box src="#wall" repeat="1 1" normal-map="#wall-NRM" normal-texture-repeat="1 1" normal-scale="1 -1" roughness="0.3" position="0 2 5" rotation="" scale="" material="" geometry="depth: 0.1; height: 4; width: 10" visible="" id="wall3"></a-box>
+        <a-box src="#wall" repeat="1 1" normal-map="#wall-NRM" normal-texture-repeat="1 1" normal-scale="1 -1" roughness="0.3" position="0 2 -5" rotation="" scale="" material="" geometry="depth: 0.1; height: 4; width: 10" visible="" id="wall4"></a-box>
 
-    <!--DOOR-->
-    <a-entity id="door" shadow="" gltf-model="museum/assets/models/door/scene.gltf" position="-4.9 0 0" rotation="0 90 0" scale="1.3 1.3 1">
-        <a-box id="openInteractiv" shadow="" position="0.08161 1.02017 0" rotation="0 90 0" scale="0.30042 2.08234 1" material="opacity: 0; transparent: true" interactive="" geometry=""></a-box>
+        <!--DOOR-->
+        <a-entity id="door" shadow="" gltf-model="museum/assets/models/door/scene.gltf" position="-4.9 0 0" rotation="0 90 0" scale="1.3 1.3 1">
+            <a-box id="openInteractiv" shadow="" position="0.08161 1.02017 0" rotation="0 90 0" scale="0.30042 2.08234 1" material="opacity: 0; transparent: true" interactive="" geometry=""></a-box>
+        </a-entity>
     </a-entity>
        
 
@@ -482,6 +486,17 @@
         <a-troika-text color="black" id="text1" troika-text="letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 4; font: Roboto; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify" rotation="0 -90 0" position="0 1.78363 0"></a-troika-text>
     </a-entity>
     <!--ITEM5-->
+
+    <!--PDF1-->
+    <a-entity>
+        <a-entity id="kiosk"  gltf-model="#kiosk" position="1.07908 -1.72651 -4.47078" rotation="" scale="0.2 0.2 0.2"></a-entity>
+        <a-entity id="pdf1" geometry="primitive: plane; height: 1.88; width: 1.15" position="1.08029 1.775 -4.234" material="src: #pdf_renderer1"></a-entity>
+        <a-box id="block" shadow=""  position="1.09673 1.34623 -4.71936" rotation="0 90 0" scale="0.09278 2.11912 -1.05479" material="opacity: 0; transparent: true"></a-box>
+        <a-image id="markerUp1" src="#marker" rotation="" position="1.77277 1.81607 -4.228" scale="0.1 0.1 0.1"></a-image>
+        <a-image id="markerDown1" src="#marker" rotation="0 0 179.9998479605043" position="0.40263 1.816 -4.22792" scale="0.1 0.1 0.1"></a-image>
+        <a-troika-text color="black" id="currentPage1" troika-text="value: 1; letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 3; font: Roboto; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify" rotation="" position="1.04033 2.84756 -4.22747"></a-troika-text>
+    </a-entity>
+    <!--PDF1-->
 
 
 
