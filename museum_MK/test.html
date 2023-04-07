@@ -2,165 +2,128 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Navmesh Constraint Example</title>
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    <script>
-      /* global AFRAME, THREE */
-
-/* Constrain an object to a navmesh, for example place this element after wasd-controls like so:
-`wasd-controls navmesh-physics="#navmesh-el"`
-*/
-AFRAME.registerComponent('simple-navmesh-constraint', {
-  schema: {
-    enabled: {
-      default: true
-    },
-    navmesh: {
-    default: 'a-entity'
-    },
-    fall: {
-      default: 0.5
-    },
-    height: {
-      default: 1.6
-    },
-    exclude: {
-      default: ''
-    },
-    xzOrigin: {
-      default: ''
-    }
-  },
-  
-  update: function () {
-    this.lastPosition = null;
-    this.excludes = this.data.exclude ? Array.from(document.querySelectorAll(this.data.exclude)):[];
-    const els = Array.from(document.querySelectorAll(this.data.navmesh));
-    if (els === null) {
-      console.warn('navmesh-physics: Did not match any elements');
-      this.objects = [];
-    } else {
-      this.objects = els.map(el => el.object3D).concat(this.excludes.map(el => el.object3D));
-    }
-    this.xzOrigin = this.data.xzOrigin ? this.el.querySelector(this.data.xzOrigin) : this.el;
-  },
-
-  tick: (function () {
-    const nextPosition = new THREE.Vector3();
-    const tempVec = new THREE.Vector3();
-    const scanPattern = [
-      [0,1], // Default the next location
-      [0,0.5], // Check that the path to that location was fine
-      [30,0.4], // A little to the side shorter range
-      [-30,0.4], // A little to the side shorter range
-      [60,0.2], // Moderately to the side short range
-      [-60,0.2], // Moderately to the side short range
-      [80,0.06], // Perpendicular very short range
-      [-80,0.06], // Perpendicular very short range
-    ];
-    const down = new THREE.Vector3(0,-1,0);
-    const raycaster = new THREE.Raycaster();
-    const gravity = -1;
-    const maxYVelocity = 0.5;
-    const results = [];
-    let yVel = 0;
-    let firstTry = true;
-    
-    return function tick(time, delta) {
-      if (this.data.enabled === false) return;
-      if (this.lastPosition === null) {
-        firstTry = true;
-        this.lastPosition = new THREE.Vector3();
-        this.xzOrigin.object3D.getWorldPosition(this.lastPosition);
-        if (this.data.xzOrigin) this.lastPosition.y -= this.xzOrigin.object3D.position.y;
-      }
-      
-      const el = this.el;
-      if (this.objects.length === 0) return;
-
-      this.xzOrigin.object3D.getWorldPosition(nextPosition);
-      if (this.data.xzOrigin) nextPosition.y -= this.xzOrigin.object3D.position.y;
-      if (nextPosition.distanceTo(this.lastPosition) <= 0.01) return;
-      
-      let didHit = false;
-      // So that it does not get stuck it takes as few samples around the user and finds the most appropriate
-      scanPatternLoop:
-      for (const [angle, distance] of scanPattern) {
-        tempVec.subVectors(nextPosition, this.lastPosition);
-        tempVec.applyAxisAngle(down, angle*Math.PI/180);
-        tempVec.multiplyScalar(distance);
-        tempVec.add(this.lastPosition);
-        tempVec.y += maxYVelocity;
-        tempVec.y -= this.data.height;
-        raycaster.set(tempVec, down);
-        raycaster.far = this.data.fall > 0 ? this.data.fall + maxYVelocity : Infinity;
-        raycaster.intersectObjects(this.objects, true, results);
-        
-        if (results.length) {
-          // If it hit something we want to avoid then ignore it and stop looking
-          for (const result of results) {
-            if(this.excludes.includes(result.object.el)) {
-              results.splice(0);
-              continue scanPatternLoop;
-            }
-          }
-          const hitPos = results[0].point;
-          results.splice(0);
-          hitPos.y += this.data.height;
-          if (nextPosition.y - (hitPos.y - yVel*2) > 0.01) {
-            yVel += Math.max(gravity * delta * 0.001, -maxYVelocity);
-            hitPos.y = nextPosition.y + yVel;
-          } else {
-            yVel = 0;
-          }
-          tempVec.copy(hitPos);
-          this.xzOrigin.object3D.parent.worldToLocal(tempVec);
-          tempVec.sub(this.xzOrigin.object3D.position);
-          if (this.data.xzOrigin) tempVec.y += this.xzOrigin.object3D.position.y;
-          this.el.object3D.position.add(tempVec);
-          
-          this.lastPosition.copy(hitPos);
-          didHit = true;
-          break;
-        }
-        
-      }
-      
-      if (didHit) {
-        firstTry = false;
-      }
-      
-      if (!firstTry && !didHit) {
-        this.el.object3D.position.copy(this.lastPosition);
-        this.el.object3D.parent.worldToLocal(this.el.object3D.position);
-      }
-    }
-  }())
-});
-    </script>
-
+    <title>PDF Viewer in A-Frame</title>
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
   </head>
   <body>
+
+        <!-- Add the buttons here -->
+        <button id="previous-button">Previous</button>
+        <button id="next-button">Next</button>
+
+
     <a-scene>
-      <!-- Camera and player controls -->
-      <a-entity
-        id="player"
-        camera
-        look-controls
-        wasd-controls
-        simple-navmesh-constraint="navmesh: #navmesh-el"
-        position="0 1.6 0"
-      ></a-entity>
+      <a-assets>
+        <img id="pdf-page" crossorigin="anonymous" />
+      </a-assets>
+      
+      <a-entity id="player" camera="" look-controls="pointerLockEnabled: true" wasd-controls="acceleration: 50" simple-navmesh-constraint="navmesh: #navmesh-el; exclude: .navmesh-hole" position="0 1.5999999999999999 -1.443705196212557" rotation="-33.68991835369242 85.02693679741421 0" data-aframe-inspector-original-camera="">
+        <a-cursor material="" raycaster="" cursor="" geometry=""></a-cursor>
+    </a-entity>
+      
+      <a-plane id="pdf-display" src="#pdf-page" width="2" height="2" position="0 1.6 0" material="shader: flat;"></a-plane>
+      
+      <a-sky color="#ECECEC"></a-sky>
+
+
+
+
+
+
+
+
+
+
+      <a-entity id="previous-button" geometry="primitive: plane; width: 1; height: 0.5" position="-1.5 1.25 0" material="color: blue" text="value: Previous; align: center; width: 4; color: white;"></a-entity>
+      <a-entity id="next-button" geometry="primitive: plane; width: 1; height: 0.5" position="1.5 1.25 0" material="color: green" text="value: Next; align: center; width: 4; color: white;"></a-entity>
     
-      <!-- Navmesh and floor -->
-      <a-plane
-        id="navmesh-el"
-        position="0 0 0"
-        rotation="-90 0 0"
-        width="10"
-        height="10"
-        color="#7BC8A4"
-      ></a-plane>
-    </a-scene>    
+    </a-scene>
+
+    <script>
+      (async () => {
+        const pdfUrl = "./kowalowski1.pdf";
+        const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
+        let currentPage = 1;
+      
+        const setPage = async (pageNum) => {
+          const page = await pdf.getPage(pageNum);
+          const viewport = page.getViewport({ scale: 1 });
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+      
+          const renderContext = {
+            canvasContext: ctx,
+            viewport: viewport,
+          };
+          await page.render(renderContext).promise;
+      
+          const img = document.querySelector("#pdf-page");
+          img.src = canvas.toDataURL();
+        };
+      
+        setPage(currentPage);
+      
+        // Handle the button click events
+        document.querySelector("#previous-button").addEventListener("click", () => {
+          if (currentPage > 1) {
+            currentPage--;
+            setPage(currentPage);
+          }
+        });
+      
+        document.querySelector("#next-button").addEventListener("click", () => {
+          if (currentPage < pdf.numPages) {
+            currentPage++;
+            setPage(currentPage);
+          }
+        });
+      })();
+    </script>
+    
+    <script>
+      (async () => {
+        const pdfUrl = "./kowalowski1.pdf";
+        const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
+        let currentPage = 1;
+      
+        const setPage = async (pageNum) => {
+          const page = await pdf.getPage(pageNum);
+          const viewport = page.getViewport({ scale: 1 });
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+      
+          const renderContext = {
+            canvasContext: ctx,
+            viewport: viewport,
+          };
+          await page.render(renderContext).promise;
+      
+          const img = document.querySelector("#pdf-page");
+          img.src = canvas.toDataURL();
+        };
+      
+        setPage(currentPage);
+      
+        document.querySelector("#previous-button").addEventListener("click", () => {
+          if (currentPage > 1) {
+            currentPage--;
+            setPage(currentPage);
+          }
+        });
+      
+        document.querySelector("#next-button").addEventListener("click", () => {
+          if (currentPage < pdf.numPages) {
+            currentPage++;
+            setPage(currentPage);
+          }
+        });
+      })();
+    </script>
+        
   </body>
 </html>

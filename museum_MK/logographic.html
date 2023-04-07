@@ -22,6 +22,9 @@
 
     <a-scene preloader="slowLoad: true" shadow="autoUpdate: true" cursor="rayOrigin: mouse" render-pdf render-pdf2 render-pdf3 inspector="url: https://cdn.jsdelivr.net/gh/aframevr/aframe-inspector@master/dist/aframe-inspector.min.js">
         
+        <canvas id="pdf-canvas"></canvas>
+
+        <a-entity geometry="primitive: plane" material="src: #pdf-canvas"></a-entity>
 
 
         <a-assets>
@@ -146,10 +149,10 @@
     
 
 
-    <!-- <script>
+    <script>
 
         var myState = {
-            pdf: "./museum/assets/general/pdfs/kowalowski1.pdf",
+            pdf: "./kowalowski1.pdf",
             currentPage: 1,
             usedObject: "#pdf1",
             usedCanvas : "pdf_renderer1",
@@ -312,58 +315,78 @@
             });
         }
 
+        const setPage = async (pageNum) => {
+          const page = await pdf.getPage(pageNum);
+          const viewport = page.getViewport({ scale: 1 });
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+      
+          const renderContext = {
+            canvasContext: ctx,
+            viewport: viewport,
+          };
+          await page.render(renderContext).promise;
+      
+          const img = document.querySelector("#pdf-page");
+          img.src = canvas.toDataURL();
+        };
+
         document.querySelector('#markerDown1').addEventListener('click', function () {
 
             if(myState.pdf == null|| myState.currentPage === 1)
                 return;
-            myState.currentPage -= 1;
-            document.querySelector('#currentPage1').setAttribute('troika-text', 'value: '+ myState.currentPage);
-            render(myState);
+            myState.currentPage --;
+            setPage(myState.currentPage);
+            // document.querySelector('#currentPage1').setAttribute('troika-text', 'value: '+ myState.currentPage);
+            // render(myState);
         });
 
         document.querySelector('#markerUp1').addEventListener('click', function () {
-            // console.log(myState);
-            // console.log(myState.pdf);
+            console.log(myState);
+            console.log(myState.pdf);
             // console.log(myState.pdf._pdfInfo);
             // console.log(myState.pdf._pdfInfo.numPages);
             if(myState.pdf == null /* || myState.currentPage > myState.pdf._pdfInfo.numPages */)
                 return;
-            myState.currentPage += 1;
-            document.querySelector('#currentPage1').setAttribute('troika-text', 'value: '+ myState.currentPage);
-            render(myState);
+            myState.currentPage ++;
+            setPage(myState.currentPage);
+            // document.querySelector('#currentPage1').setAttribute('troika-text', 'value: '+ myState.currentPage);
+            // render(myState);
         });
 
-        document.querySelector('#markerDown2').addEventListener('click', function () {
-            if(myState2.pdf == null|| myState2.currentPage === 1)
-                return;
-            myState2.currentPage -= 1;
-            document.querySelector('#currentPage2').setAttribute('troika-text', 'value: '+ myState2.currentPage);
-            render(myState2);
-        });
+        // document.querySelector('#markerDown2').addEventListener('click', function () {
+        //     if(myState2.pdf == null|| myState2.currentPage === 1)
+        //         return;
+        //     myState2.currentPage -= 1;
+        //     document.querySelector('#currentPage2').setAttribute('troika-text', 'value: '+ myState2.currentPage);
+        //     render(myState2);
+        // });
 
-        document.querySelector('#markerUp2').addEventListener('click', function () {
-            if(myState2.pdf == null || myState2.currentPage > myState2.pdf._pdfInfo.numPages)
-                return;
-            myState2.currentPage += 1;
-            document.querySelector('#currentPage2').setAttribute('troika-text', 'value: '+ myState2.currentPage);
-            render(myState2);
-        });
+        // document.querySelector('#markerUp2').addEventListener('click', function () {
+        //     if(myState2.pdf == null || myState2.currentPage > myState2.pdf._pdfInfo.numPages)
+        //         return;
+        //     myState2.currentPage += 1;
+        //     document.querySelector('#currentPage2').setAttribute('troika-text', 'value: '+ myState2.currentPage);
+        //     render(myState2);
+        // });
 
-        document.querySelector('#markerDown3').addEventListener('click', function () {
-            if(myState3.pdf == null|| myState3.currentPage === 1)
-                return;
-            myState3.currentPage -= 1;
-            document.querySelector('#currentPage3').setAttribute('troika-text', 'value: '+ myState3.currentPage);
-            render(myState3);
-        });
+        // document.querySelector('#markerDown3').addEventListener('click', function () {
+        //     if(myState3.pdf == null|| myState3.currentPage === 1)
+        //         return;
+        //     myState3.currentPage -= 1;
+        //     document.querySelector('#currentPage3').setAttribute('troika-text', 'value: '+ myState3.currentPage);
+        //     render(myState3);
+        // });
 
-        document.querySelector('#markerUp3').addEventListener('click', function () {
-            if(myState3.pdf == null || myState3.currentPage > myState3.pdf._pdfInfo.numPages)
-                return;
-            myState3.currentPage += 1;
-            document.querySelector('#currentPage3').setAttribute('troika-text', 'value: '+ myState3.currentPage);
-            render(myState3);
-        });
+        // document.querySelector('#markerUp3').addEventListener('click', function () {
+        //     if(myState3.pdf == null || myState3.currentPage > myState3.pdf._pdfInfo.numPages)
+        //         return;
+        //     myState3.currentPage += 1;
+        //     document.querySelector('#currentPage3').setAttribute('troika-text', 'value: '+ myState3.currentPage);
+        //     render(myState3);
+        // });
 
         document.querySelector('#videoControls').addEventListener('click', function () {
             var myVideo = document.querySelector('#video1');
@@ -383,7 +406,7 @@
             }
         });
 
-    </script> -->
+    </script>
 
     
 
