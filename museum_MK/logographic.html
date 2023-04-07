@@ -159,21 +159,21 @@
             zoom: 5
         };
 
-        var myState2 = {
-            pdf: null,
-            currentPage: 1,
-            usedObject: "#pdf2",
-            usedCanvas : "pdf_renderer2",
-            zoom: 5
-        };
+        // var myState2 = {
+        //     pdf: null,
+        //     currentPage: 1,
+        //     usedObject: "#pdf2",
+        //     usedCanvas : "pdf_renderer2",
+        //     zoom: 5
+        // };
 
-        var myState3 = {
-            pdf: null,
-            currentPage: 1,
-            usedObject: "#pdf3",
-            usedCanvas : "pdf_renderer3",
-            zoom: 5
-        };
+        // var myState3 = {
+        //     pdf: null,
+        //     currentPage: 1,
+        //     usedObject: "#pdf3",
+        //     usedCanvas : "pdf_renderer3",
+        //     zoom: 5
+        // };
 
         AFRAME.registerComponent('interactive', {
             init: function () {
@@ -203,12 +203,11 @@
 
         function pdfReader(obj){
             if(obj.item_number === "11"){
-//             console.log("Dostanem sa sem 11");
+             console.log("Dostanem sa sem 11");
                 AFRAME.registerComponent('render-pdf', {
                     init: function () {
 
-                        pdfjsLib.getDocument(obj.file)
-                            .promise.then(doc => {
+                        pdfjsLib.getDocument(obj.file).promise.then(doc => {
                             console.log("this file has" + doc._pdfInfo.numPages + "pages");
                             myState.pdf = doc;
                             render(myState);
@@ -337,7 +336,7 @@
 
             if(myState.pdf == null|| myState.currentPage === 1)
                 return;
-            myState.currentPage --;
+            myState.currentPage -=1;
             setPage(myState.currentPage);
             // document.querySelector('#currentPage1').setAttribute('troika-text', 'value: '+ myState.currentPage);
             // render(myState);
@@ -345,15 +344,17 @@
 
         document.querySelector('#markerUp1').addEventListener('click', function () {
             console.log(myState);
-            console.log(myState.pdf);
+            //console.log(myState.pdf);
             // console.log(myState.pdf._pdfInfo);
             // console.log(myState.pdf._pdfInfo.numPages);
             if(myState.pdf == null /* || myState.currentPage > myState.pdf._pdfInfo.numPages */)
                 return;
-            myState.currentPage ++;
-            setPage(myState.currentPage);
+            myState.currentPage +=1;
+            document.querySelector("#currentPage1").setAttribute("troika-text", "value: " + myState.currentPage);
+            render(myState);
+            //setPage(myState.currentPage);
             // document.querySelector('#currentPage1').setAttribute('troika-text', 'value: '+ myState.currentPage);
-            // render(myState);
+            // 
         });
 
         // document.querySelector('#markerDown2').addEventListener('click', function () {
