@@ -67,7 +67,34 @@
         var suradnice = 3.00;
         var counter = 1;
 
+        var first = false;
         function pdfReader(obj){
+            if (!first) {
+                AFRAME.registerComponent('render-pdf', {
+                    init: function () {
+
+                        pdfjsLib.getDocument("./museum/assets/general/pdfs/purple-history.pdf")
+                            .promise.then(doc => {
+                            console.log("this file has" + doc._pdfInfo.numPages + "pages");
+                            myState.pdf = doc;
+                            render(myState);
+                        });
+                    }
+                });
+                AFRAME.registerComponent('render-pdf2', {
+                    init: function () {
+                        pdfjsLib.getDocument("./museum/assets/general/pdfs/tnm_12_1_17-37.pdf")
+                            .promise.then(doc => {
+                            console.log("this file has" + doc._pdfInfo.numPages + "pages");
+                            myState2.pdf = doc;
+                            render(myState2);
+                        });
+
+                    }
+                });
+                first = true;
+            }
+            return;
             if(obj.item_number === "11"){
 //             console.log("Dostanem sa sem 11");
                 AFRAME.registerComponent('render-pdf', {
@@ -115,7 +142,13 @@
 
         //receiving response from returnInfo.php
         ajax.onreadystatechange = function () {
+            pdfReader(obj);
+            console.log("volam funkciu ajax.onreadystatechange");
+            console.log(this.readyState);
+            console.log(this.status);
+            console.log(this);
             if (this.readyState == 4 && this.status == 200) {
+                console.log("volam funkciu 2 ajax.onreadystatechange");
                 if(this.responseText== null){
                     return;
                 }
@@ -181,6 +214,8 @@
             });
         }
 
+        window.addEventListener("DOMContentLoaded", () => {
+
         document.querySelector('#markerDown1').addEventListener('click', function () {
             if(myState.pdf == null|| myState.currentPage === 1)
                 return;
@@ -188,6 +223,8 @@
             document.querySelector('#currentPage1').setAttribute('troika-text', 'value: '+ myState.currentPage);
             render(myState);
         });
+
+
 
         document.querySelector('#markerUp1').addEventListener('click', function () {
             if(myState.pdf == null || myState.currentPage > myState.pdf._pdfInfo.numPages)
@@ -246,7 +283,7 @@
                 myVideo.pause();
             }
         });
-
+    });
     </script>
 </head>
 
@@ -322,13 +359,13 @@
     <!--ITEM1-->
     <a-entity gltf-model="#frame" position="10.72801 -0.01169 -1.69394" rotation="-180 0 -180"></a-entity>
     <a-image  id="item1" rotation="0 -90 0" position="10.71962 2.22091 -0.98638" material="" geometry="height: 1.76; width: 1.4"></a-image>
-    <a-troika-text color="black" id="text1" troika-text="letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 4; font: Roboto; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify" rotation="0 -90 0" position="10.71745 2.10293 -6.12803"></a-troika-text>
+    <a-troika-text color="black" id="text1" troika-text="letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 4; font: Roboto; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify; value: The JN-25 cipher was a prominent Japanese naval code used during World War II, primarily for communication between the Imperial Japanese Navy and its fleet. Invented in the late 1930s, JN-25 consisted of a codebook and an additive component. The codebook contained five-digit numbers representing words, phrases, or characters, while the additive component consisted of a series of random numbers. To encrypt a message, the plaintext was first encoded using the codebook, then the additive component was applied in a modulo-3 fashion. JN-25 underwent multiple revisions to maintain security throughout the war.." rotation="0 -90 0" position="10.71745 2.10293 -6.12803"></a-troika-text>
     <!--ITEM1-->
 
     <!--ITEM2-->
     <a-entity gltf-model="#frame" position="10.72755 -0.012 -10.66642" rotation="180 0 180"></a-entity>
     <a-image  id="item2" rotation="0 -90 0" position="10.71563 2.221 -9.95737" material="" geometry="width: 1.4; height: 1.76"></a-image>
-    <a-troika-text color="black" id="text2" troika-text="letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 4; font: Roboto; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify" rotation="0 -90 0" position="10.7442 2.0645 -15.13641"></a-troika-text>
+    <a-troika-text color="black" id="text2" troika-text="letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 4; font: Roboto; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify; value: The Japanese Red Book cipher was a diplomatic code employed by Japan before and during World War II. Developed in the 1930s, it utilized a codebook of groups of numbers representing syllables in the Japanese language. To encrypt messages, plaintext syllables were substituted with corresponding number groups from the codebook. The Red Book cipher was a simple substitution cipher vulnerable to frequency analysis. Allied codebreakers successfully cracked the cipher, gaining valuable intelligence throughout the war. The Japanese later replaced the Red Book cipher with more advanced systems, such as the Purple cipher, to enhance security." rotation="0 -90 0" position="10.7442 2.0645 -15.13641"></a-troika-text>
     <!--ITEM2-->
 
     <!--ITEM3-->
