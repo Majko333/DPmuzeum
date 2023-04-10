@@ -15,170 +15,39 @@
     <!-- PDF -->
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.0.943/pdf.min.js"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
-    
-</head>
-
-<body>
-
-    <a-scene preloader="slowLoad: true" shadow="autoUpdate: true" cursor="rayOrigin: mouse" render-pdf render-pdf2 render-pdf3 inspector="url: https://cdn.jsdelivr.net/gh/aframevr/aframe-inspector@master/dist/aframe-inspector.min.js">
-        
-
-
-
-        <a-assets>
-            <img id="wall" src="museum/assets/general/wall.jpg">
-            <img id="wall-NRM" src="museum/assets/general/wall-NRM.jpg">
-            <img id="floor" src="museum/assets/general/floor.jpg">
-            <img id="floor-NRM" src="museum/assets/general/floor_NRM.jpg">
-            <img id="sky" src="museum/assets/general/sky.jpg">
-    
-            <a-asset-items id="obj" src="museum/assets/models/hand/gear_vr_controller.obj" preload="auto"></a-asset-items>
-            <a-asset-items id="mtl" src="museum/assets/models/hand/gear_vr_controller.mtl" preload="auto"></a-asset-items>
-            <a-asset-items id="door" position="-4.95148 -0.014 0.438" src="museum/assets/models/door/scene.gltf" preload="auto"></a-asset-items>
-            <a-asset-items id="kiosk" src="museum/assets/models/interactive_kiosk/scene.gltf" preload="auto"></a-asset-items>
-            <a-asset-item id="frame" src="museum/assets/models/frame.gltf"></a-asset-item>
-            <a-asset-items id="projector" src="museum/assets/models/projector/scene1.gltf"></a-asset-items>
-            <a-asset-items id="button" src="museum/assets/models/button.gltf"></a-asset-items>
-    
-            <img id="marker" src="museum/assets/general/icons/arrow_right.png">
-            <video id="video1"></video>
-            <video id="video2"></video>
-            <canvas id="pdf_renderer1"></canvas>
-            <canvas id="pdf_renderer2"></canvas>
-            <canvas id="pdf_renderer3"></canvas>
-            <!-- nav mesh-->
-            <a-asset-item id="main-navmesh" src="museum/assets/navmeshes/navmesh_room3.gltf"></a-asset-item>
-    
-        </a-assets>
-        
-        <!--SKY-->
-        <a-sky src="#sky"></a-sky>
-        <!--LIGHT-->
-        <a-entity light="type : ambient; intensity: 1.1; castShadows: true"></a-entity>
-        <a-entity light="castShadow: true; intensity: 0.4" position="2.03218 13.8244 -1.34995"></a-entity>
-        <!--LIGHT-->
-    
-        <!--PLAYER-->
-        <a-entity id="player" camera="" look-controls="pointerLockEnabled: true" wasd-controls="acceleration: 50" simple-navmesh-constraint="navmesh: #navmesh-el; exclude: .navmesh-hole" position="0 1.5999999999999999 -1.443705196212557" rotation="-33.68991835369242 85.02693679741421 0" data-aframe-inspector-original-camera="">
-            <a-cursor material="" raycaster="" cursor="" geometry=""></a-cursor>
-        </a-entity>
-    
-    
-        <!--ROOM AREA CONSTRAINT-->
-        <a-plane id="navmesh-el" position="0 0 0" rotation="-90 0 0" src="#floor" normal-map="#floor-NRM" normal-texture-repeat="1 1" normal-scale="1 -1" roughness="0.3" width="10" height="10" visible="false"></a-plane>
-        <!--FLOOR CONSTRAINT-->
-        <a-plane rotation="-90 0 0" width="1.5" height="0.6" class="navmesh-hole" visible="false" material="" geometry=""></a-plane>
-        
-        <!--BUILDING-->      
-        <a-entity>
-            <!--FLOOR-->
-            <a-plane id="floor" position="" rotation="-90 0 0" src="#floor" normal-map="#floor-NRM" normal-texture-repeat="1 1" normal-scale="1 -1" roughness="0.3" width="10" height="10" material="" geometry="width: 20; height: 20" visible=""></a-plane>
-    
-            <!--WALLS-->
-            <a-box src="#wall" repeat="1 1" normal-map="#wall-NRM" normal-texture-repeat="1 1" normal-scale="1 -1" roughness="0.3" position="5 2 0" rotation="0 90 0" scale="" material="" geometry="depth: 0.1; height: 4; width: 10" visible="true" id="wall1"></a-box>
-            <a-box src="#wall" repeat="1 1" normal-map="#wall-NRM" normal-texture-repeat="1 1" normal-scale="1 -1" roughness="0.3" position="-5 2 0" rotation="0 90 0" scale="" material="" geometry="depth: 0.1; height: 4; width: 10" visible="" id="wall2"></a-box>
-            <a-box src="#wall" repeat="1 1" normal-map="#wall-NRM" normal-texture-repeat="1 1" normal-scale="1 -1" roughness="0.3" position="0 2 5" rotation="" scale="" material="" geometry="depth: 0.1; height: 4; width: 10" visible="" id="wall3"></a-box>
-            <a-box src="#wall" repeat="1 1" normal-map="#wall-NRM" normal-texture-repeat="1 1" normal-scale="1 -1" roughness="0.3" position="0 2 -5" rotation="" scale="" material="" geometry="depth: 0.1; height: 4; width: 10" visible="" id="wall4"></a-box>
-    
-            <!--DOOR-->
-            <a-entity id="door" shadow="" gltf-model="museum/assets/models/door/scene.gltf" position="-4.9 0 0" rotation="0 90 0" scale="1.3 1.3 1">
-                <a-box id="openInteractiv" shadow="" position="0.08161 1.02017 0" rotation="0 90 0" scale="0.30042 2.08234 1" material="opacity: 0; transparent: true" interactive="" geometry=""></a-box>
-            </a-entity>
-        </a-entity>
-           
-    
-        <!--ITEM1--> <!--JN-25-->
-        <a-entity gltf-model="museum/assets/models/frame.gltf" position="4.9 0 0" rotation="" id="showcase1">
-            <a-image id="item1" rotation="0 90 0" position="0 2.22216 -0.71049" material="" geometry="height: 1.76; width: 1.4"></a-image>
-            <a-troika-text color="black" id="text1" troika-text="letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 4; font: ; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify; value: The JN-25 cipher was a prominent Japanese naval code used during World War II, primarily for communication between the Imperial Japanese Navy and its fleet. Invented in the late 1930s, JN-25 consisted of a codebook and an additive component. The codebook contained five-digit numbers representing words, phrases, or characters, while the additive component consisted of a series of random numbers. To encrypt a message, the plaintext was first encoded using the codebook, then the additive component was applied in a modulo-3 fashion. JN-25 underwent multiple revisions to maintain security throughout the war.." rotation="0 -90 0" position="0 1.78363 0"></a-troika-text>
-        </a-entity>
-        <!--ITEM1-->
-    
-        <!--ITEM2--> <!--I-RO-HA-->
-        <a-entity gltf-model="museum/assets/models/frame.gltf" position="3.01086 0 0" rotation="" id="showcase2">
-            <a-image id="item2" rotation="0 90 0" position="0 2.22216 -0.71049" material="" geometry="height: 1.76; width: 1.4"></a-image>
-            <a-troika-text color="black" id="text2" troika-text="letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 4; font: ; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify; value: The I-RO-HA (checkerboard) cipher is a Japanese cryptographic system based on the traditional Iroha ordering of Japanese syllables. Invented in the 16th century, it employs a 7x7 grid filled with 48 unique Japanese syllables (one space blank) derived from the Iroha poem. To encrypt a message, each syllable is replaced with its corresponding row and column coordinates from the grid. The checkerboard cipher is a simple substitution cipher that can be vulnerable to frequency analysis. To crack the cipher, codebreakers would analyze syllable frequency in the ciphertext and compare it to the known frequency of syllables in the Japanese language, eventually deducing the grid arrangement." rotation="0 -90 0" position="0 1.78363 0"></a-troika-text>
-        </a-entity>
-        <!--ITEM2-->
-    
-        <!--ITEM3--> <!--THE RED BOOK-->
-        <a-entity gltf-model="museum/assets/models/frame.gltf" position="" rotation="" id="showcase3">
-            <a-image id="item3" rotation="0 90 0" position="0 2.22216 -0.71049" material="" geometry="height: 1.76; width: 1.4"></a-image>
-            <a-troika-text color="black" id="text3" troika-text="letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 4; font: ; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify; value: The Japanese Red Book cipher was a diplomatic code employed by Japan before and during World War II. Developed in the 1930s, it utilized a codebook of groups of numbers representing syllables in the Japanese language. To encrypt messages, plaintext syllables were substituted with corresponding number groups from the codebook. The Red Book cipher was a simple substitution cipher vulnerable to frequency analysis. Allied codebreakers successfully cracked the cipher, gaining valuable intelligence throughout the war. The Japanese later replaced the Red Book cipher with more advanced systems, such as the Purple cipher, to enhance security." rotation="0 -90 0" position="0 1.78363 0"></a-troika-text>
-        </a-entity>
-        <!--ITEM3-->
-    
-        <!--ITEM4--> <!--THE BLUE BOOK-->
-        <a-entity gltf-model="museum/assets/models/frame.gltf" position="" rotation="" id="showcase4">
-            <a-image id="item4" rotation="0 90 0" position="0 2.22216 -0.71049" material="" geometry="height: 1.76; width: 1.4"></a-image>
-            <a-troika-text color="black" id="text4" troika-text="letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 4; font: ; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify; value: The Blue Book code, which was a Japanese cryptographic system discovered by U.S. cryptanalysts in September 1931. The code consisted of groups of four Kana symbols instead of three, like its predecessor, the Red Book code. The Blue Book code was more complex, involving two transpositions—one simple and the other more sophisticated, using columnar transposition with nulls and blanks. The Blue Code was discontinued around June 1939 or October 1938, consistent with Nuboer's memoirs, which mention that the work on the '.' code continued until he left for the Netherlands in the summer of 1938." rotation="0 -90 0" position="0 1.78363 0"></a-troika-text>
-        </a-entity>
-        <!--ITEM4-->
-    
-        <!--ITEM5--> <!--Type B Cipher machine-->
-        <a-entity gltf-model="museum/assets/models/frame.gltf" position="" rotation="" id="showcase5">
-            <a-image id="item5" rotation="0 90 0" position="0 2.22216 -0.71049" material="" geometry="height: 1.76; width: 1.4"></a-image>
-            <a-troika-text color="black" id="text5" troika-text="letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 4; font: ; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify; value: The System 97 Typewriter for European Characters, or Type B Cipher Machine (codenamed Purple by the US), was an electromechanical encryption machine used by the Japanese Foreign Office from February 1939 to the end of World War II. Replacing the Type A Red machine, it encrypted sensitive diplomatic traffic using stepping-switches and the 26-letter English alphabet for telegraphy. The 26-letters were separated into groups of six and twenty, each scrambled differently. The US Army Signals Intelligence Service (SIS) cracked the sixes group early on, while the twenties group was deciphered in September 1940, enabling them to build a machine that duplicated the Japanese machines behavior. The Japanese also used stepping-switch systems like Coral and Jade without dividing their alphabets."; rotation="0 -90 0" position="0 1.78363 0"></a-troika-text>
-        </a-entity>
-        <!--ITEM5-->
-
-        <!--ITEM6--> <!--Type A Cipher machine-->
-        <a-entity gltf-model="museum/assets/models/frame.gltf" position="" rotation="" id="showcase5">
-            <a-image id="item5" rotation="0 90 0" position="0 2.22216 -0.71049" material="" geometry="height: 1.76; width: 1.4"></a-image>
-            <a-troika-text color="black" id="text5" troika-text="letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 4; font: ; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify; value: The Type A Cipher Machine, codenamed Red, was a diplomatic cryptographic machine used by the Japanese Foreign Office before and during World War II. It encrypted and decrypted Latin character texts for transmission through cable services. The Red machine produced telegraph code by encrypting vowels separately from consonants to create pronounceable words, which were charged a lower rate. This sixes and twenties effect was a major weakness. Encryption was provided through a single half-rotor with sixty contacts, separating vowels and consonants using wiring and a plugboard. The rotor turned at least one step after each letter, with rotation controlled by a break wheel with removable pins. This irregular pattern of rotation produced an Alberti cipher. The Red cipher was succeeded by the more advanced Type B Purple machine, which used some of the same principles."; rotation="0 -90 0" position="0 1.78363 0"></a-troika-text>
-        </a-entity>
-        <!--ITEM6-->
-    
-        <!--PDF1-->
-        <a-entity>
-            <a-entity id="kiosk"  gltf-model="#kiosk" position="1.07908 -1.72651 -4.47078" rotation="" scale="0.2 0.2 0.2"></a-entity>
-            <a-entity id="pdf1" geometry="primitive: plane; height: 1.88; width: 1.15" position="1.08029 1.775 -4.234" material="src: #pdf_renderer1"></a-entity>
-            <a-box id="block" shadow=""  position="1.09673 1.34623 -4.71936" rotation="0 90 0" scale="0.09278 2.11912 -1.05479" material="opacity: 0; transparent: true"></a-box>
-            <a-image id="markerUp1" src="#marker" rotation="" position="1.77277 1.81607 -4.228" scale="0.1 0.1 0.1"></a-image>
-            <a-image id="markerDown1" src="#marker" rotation="0 0 179.9998479605043" position="0.40263 1.816 -4.22792" scale="0.1 0.1 0.1"></a-image>
-            <a-troika-text color="black" id="currentPage1" troika-text="value: 1; letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 3; font: ; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify" rotation="" position="1.04033 2.84756 -4.22747"></a-troika-text>
-        </a-entity>
-        <!--PDF1-->
-    
-        
-    
-    
-    
-        </a-scene>
-
-
-
-</body>
-<footer>
 
     
 
 
     <script>
 
+        
         var myState = {
-            pdf: "./kowalowski1.pdf",
+            pdf: null,
             currentPage: 1,
             usedObject: "#pdf1",
             usedCanvas : "pdf_renderer1",
-            zoom: 5
+            zoom: 5,
+            pageRendering : false
         };
 
-        // var myState2 = {
-        //     pdf: null,
-        //     currentPage: 1,
-        //     usedObject: "#pdf2",
-        //     usedCanvas : "pdf_renderer2",
-        //     zoom: 5
-        // };
+        var myState2 = {
+            pdf: null,
+            currentPage: 1,
+            usedObject: "#pdf2",
+            usedCanvas : "pdf_renderer2",
+            zoom: 5,
+            pageRendering : false
+        };
 
-        // var myState3 = {
-        //     pdf: null,
-        //     currentPage: 1,
-        //     usedObject: "#pdf3",
-        //     usedCanvas : "pdf_renderer3",
-        //     zoom: 5
-        // };
+        var myState3 = {
+            pdf: null,
+            currentPage: 1,
+            usedObject: "#pdf3",
+            usedCanvas : "pdf_renderer3",
+            zoom: 5,
+            pageRendering : false
+        };
 
         AFRAME.registerComponent('interactive', {
             init: function () {
@@ -197,22 +66,53 @@
         var url = "api/rest/getExhibitionItems.php?id=" + id;
         var asynchronous = true;
 
-        //ajax.open(method, url, asynchronous);
+        ajax.open(method, url, asynchronous);
 
         //send ajax request
-        //ajax.send();
+        ajax.send();
 
         var suradnice = 3.00;
         var counter = 1;
 
-
+        var first = false;
         function pdfReader(obj){
-            if(obj.item_number === "11"){
-             console.log("Dostanem sa sem 11");
+            if (!first) {
                 AFRAME.registerComponent('render-pdf', {
                     init: function () {
 
-                        pdfjsLib.getDocument(obj.file).promise.then(doc => {
+                        pdfjsLib.getDocument("./museum/assets/general/pdfs/purple-history.pdf")
+                            .promise.then(doc => {
+                            console.log("this file has" + doc._pdfInfo.numPages + "pages");
+                            myState.pdf = doc;
+                            render(myState);
+                        });
+                    }
+                });
+                AFRAME.registerComponent('render-pdf2', {
+                    init: function () {
+                        pdfjsLib.getDocument("./museum/assets/general/pdfs/tnm_12_1_17-37.pdf")
+                            .promise.then(doc => {
+                            console.log("this file has" + doc._pdfInfo.numPages + "pages");
+                            myState2.pdf = doc;
+                            render(myState2);
+                        });
+
+                    }
+                });
+                first = true;
+            }
+            
+            return;
+
+
+
+            if(obj.item_number === "11"){
+//             console.log("Dostanem sa sem 11");
+                AFRAME.registerComponent('render-pdf', {
+                    init: function () {
+
+                        pdfjsLib.getDocument(obj.file)
+                            .promise.then(doc => {
                             console.log("this file has" + doc._pdfInfo.numPages + "pages");
                             myState.pdf = doc;
                             render(myState);
@@ -253,7 +153,13 @@
 
         //receiving response from returnInfo.php
         ajax.onreadystatechange = function () {
+            pdfReader(obj);
+            console.log("volam funkciu ajax.onreadystatechange");
+            console.log(this.readyState);
+            console.log(this.status);
+            console.log(this);
             if (this.readyState == 4 && this.status == 200) {
+                console.log("volam funkciu 2 ajax.onreadystatechange");
                 if(this.responseText== null){
                     return;
                 }
@@ -294,124 +200,118 @@
         };
 
         function render(myState) {
-            myState.pdf.getPage(myState.currentPage).then(page => {
+            if (!myState.pageRendering) {
+                myState.pageRendering = true;
+            
+                myState.pdf.getPage(myState.currentPage).then(page => {
 
-                var planeEl = document.querySelector(myState.usedObject);
-                var canvas = document.getElementById(myState.usedCanvas);
-                var ctx = canvas.getContext("2d");
-                var viewport = page.getViewport(myState.zoom);
+                    var planeEl = document.querySelector(myState.usedObject);
+                    var canvas = document.getElementById(myState.usedCanvas);
+                    var ctx = canvas.getContext("2d");
+                    var viewport = page.getViewport(myState.zoom);
 
 
-                console.log("height  " + viewport.height);
-                console.log("width" + viewport.width);
-                canvas.width = viewport.width;
-                canvas.height = viewport.height;
+                    console.log(myState.currentPage);
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
 
-                var renderTask = page.render({
-                    canvasContext: ctx,
-                    viewport: viewport
+                    /*if (myState.renderTask) {
+                        myState.renderTask.cancel();
+                    }*/
+
+                    var renderTask = page.render({
+                        canvasContext: ctx,
+                        viewport: viewport
+                    });
+
+                    renderTask.promise.then(function () {
+                        myState.pageRendering = false;
+                        /*if (myState.pageNumPending !== null) {
+                            render(myState);
+                            myState.pageNumPending = null;
+                        }*/
+                        planeEl.getObject3D('mesh').material.map.needsUpdate = true;
+                    });
+
                 });
-
-                renderTask.promise.then(function () {
-                    planeEl.getObject3D('mesh').material.map.needsUpdate = true;
-                });
-
-            });
+            }
         }
 
-        const setPage = async (pageNum) => {
-          const page = await pdf.getPage(pageNum);
-          const viewport = page.getViewport({ scale: 1 });
-          const canvas = document.createElement("canvas");
-          const ctx = canvas.getContext("2d");
-          canvas.width = viewport.width;
-          canvas.height = viewport.height;
-      
-          const renderContext = {
-            canvasContext: ctx,
-            viewport: viewport,
-          };
-          await page.render(renderContext).promise;
-      
-          const img = document.querySelector("#pdf-page");
-          img.src = canvas.toDataURL();
-        };
-
-        document.querySelector('#markerDown1').addEventListener('click', function () {
-
-            if(myState.pdf == null|| myState.currentPage === 1)
-                return;
-            myState.currentPage -=1;
-            setPage(myState.currentPage);
-            // document.querySelector('#currentPage1').setAttribute('troika-text', 'value: '+ myState.currentPage);
-            // render(myState);
-        });
-
         window.addEventListener("DOMContentLoaded", () => {
-            document.querySelector('#markerUp1').addEventListener('click', function () {
-                console.log(myState);
-                console.log(myState.pdf);
-                 console.log(myState.pdf._pdfInfo);
-                 console.log(myState.pdf._pdfInfo.numPages);
-                if(myState.pdf == null /* || myState.currentPage > myState.pdf._pdfInfo.numPages */)
+
+            document.querySelector('#markerDown1').addEventListener('click', function () {
+                if(myState.pdf == null|| myState.currentPage <= 1)
                     return;
-                myState.currentPage +=1;
-                document.querySelector("#currentPage1").setAttribute("troika-text", "value: " + myState.currentPage);
-                render(myState);
-                //setPage(myState.currentPage);
-                // document.querySelector('#currentPage1').setAttribute('troika-text', 'value: '+ myState.currentPage);
-                // 
+                if (!myState.pageRendering) {
+                    myState.currentPage -= 1;
+                    document.querySelector('#currentPage1').setAttribute('troika-text', 'value: '+ myState.currentPage);
+                    render(myState);
+                }
             });
-        });
 
-        // document.querySelector('#markerDown2').addEventListener('click', function () {
-        //     if(myState2.pdf == null|| myState2.currentPage === 1)
-        //         return;
-        //     myState2.currentPage -= 1;
-        //     document.querySelector('#currentPage2').setAttribute('troika-text', 'value: '+ myState2.currentPage);
-        //     render(myState2);
-        // });
 
-        // document.querySelector('#markerUp2').addEventListener('click', function () {
-        //     if(myState2.pdf == null || myState2.currentPage > myState2.pdf._pdfInfo.numPages)
-        //         return;
-        //     myState2.currentPage += 1;
-        //     document.querySelector('#currentPage2').setAttribute('troika-text', 'value: '+ myState2.currentPage);
-        //     render(myState2);
-        // });
 
-        // document.querySelector('#markerDown3').addEventListener('click', function () {
-        //     if(myState3.pdf == null|| myState3.currentPage === 1)
-        //         return;
-        //     myState3.currentPage -= 1;
-        //     document.querySelector('#currentPage3').setAttribute('troika-text', 'value: '+ myState3.currentPage);
-        //     render(myState3);
-        // });
+            document.querySelector('#markerUp1').addEventListener('click', function () {
+                if(myState.pdf == null || myState.currentPage >= myState.pdf._pdfInfo.numPages )
+                    return;
+                if (!myState.pageRendering) {
+                    myState.currentPage += 1;
+                    document.querySelector('#currentPage1').setAttribute('troika-text', 'value: '+ myState.currentPage);
+                    render(myState);
+                }
+            });
 
-        // document.querySelector('#markerUp3').addEventListener('click', function () {
-        //     if(myState3.pdf == null || myState3.currentPage > myState3.pdf._pdfInfo.numPages)
-        //         return;
-        //     myState3.currentPage += 1;
-        //     document.querySelector('#currentPage3').setAttribute('troika-text', 'value: '+ myState3.currentPage);
-        //     render(myState3);
-        // });
+            document.querySelector('#markerDown2').addEventListener('click', function () {
+                if(myState2.pdf == null|| myState2.currentPage === 1)
+                    return;
+                if (!myState2.pageRendering) {
+                    myState2.currentPage -= 1;
+                    document.querySelector('#currentPage2').setAttribute('troika-text', 'value: '+ myState2.currentPage);
+                    render(myState2);
+                }
+            });
 
-        document.querySelector('#videoControls').addEventListener('click', function () {
-            var myVideo = document.querySelector('#video1');
-            if(myVideo.paused) {
-                myVideo.play();
-            }else {
-                myVideo.pause();
-            }
-        });
+            document.querySelector('#markerUp2').addEventListener('click', function () {
+                if(myState2.pdf == null || myState2.currentPage > myState2.pdf._pdfInfo.numPages)
+                    return;
+                myState2.currentPage += 1;
+                document.querySelector('#currentPage2').setAttribute('troika-text', 'value: '+ myState2.currentPage);
+                render(myState2);
+            });
 
-        document.querySelector('#videoControls2').addEventListener('click', function () {
-            var myVideo = document.querySelector('#video2');
-            if(myVideo.paused) {
-                myVideo.play();
-            }else {
-                myVideo.pause();
-            }
+            document.querySelector('#markerDown3').addEventListener('click', function () {
+                if(myState3.pdf == null|| myState3.currentPage === 1)
+                    return;
+                myState3.currentPage -= 1;
+                document.querySelector('#currentPage3').setAttribute('troika-text', 'value: '+ myState3.currentPage);
+                render(myState3);
+            });
+
+            document.querySelector('#markerUp3').addEventListener('click', function () {
+                if(myState3.pdf == null || myState3.currentPage > myState3.pdf._pdfInfo.numPages)
+                    return;
+                myState3.currentPage += 1;
+                document.querySelector('#currentPage3').setAttribute('troika-text', 'value: '+ myState3.currentPage);
+                render(myState3);
+            });
+
+            document.querySelector('#videoControls').addEventListener('click', function () {
+                var myVideo = document.querySelector('#video1');
+                if(myVideo.paused) {
+                    myVideo.play();
+                }else {
+                    myVideo.pause();
+                }
+            });
+
+            document.querySelector('#videoControls2').addEventListener('click', function () {
+                var myVideo = document.querySelector('#video2');
+                if(myVideo.paused) {
+                    myVideo.play();
+                }else {
+                    myVideo.pause();
+                }
+            });
         });
 
     </script>
@@ -554,6 +454,144 @@
         }())
         });
     </script>
+    
+</head>
+
+<body>
+
+    <a-scene preloader="slowLoad: true" shadow="autoUpdate: true" cursor="rayOrigin: mouse" render-pdf render-pdf2 render-pdf3 inspector="url: https://cdn.jsdelivr.net/gh/aframevr/aframe-inspector@master/dist/aframe-inspector.min.js">
+        
+
+
+
+        <a-assets>
+            <img id="wall" src="museum/assets/general/wall.jpg">
+            <img id="wall-NRM" src="museum/assets/general/wall-NRM.jpg">
+            <img id="floor" src="museum/assets/general/floor.jpg">
+            <img id="floor-NRM" src="museum/assets/general/floor_NRM.jpg">
+            <img id="sky" src="museum/assets/general/sky.jpg">
+    
+            <a-asset-items id="obj" src="museum/assets/models/hand/gear_vr_controller.obj" preload="auto"></a-asset-items>
+            <a-asset-items id="mtl" src="museum/assets/models/hand/gear_vr_controller.mtl" preload="auto"></a-asset-items>
+            <a-asset-items id="door" position="-4.95148 -0.014 0.438" src="museum/assets/models/door/scene.gltf" preload="auto"></a-asset-items>
+            <a-asset-items id="kiosk" src="museum/assets/models/interactive_kiosk/scene.gltf" preload="auto"></a-asset-items>
+            <a-asset-item id="frame" src="museum/assets/models/frame.gltf"></a-asset-item>
+            <a-asset-items id="projector" src="museum/assets/models/projector/scene1.gltf"></a-asset-items>
+            <a-asset-items id="button" src="museum/assets/models/button.gltf"></a-asset-items>
+    
+            <img id="marker" src="museum/assets/general/icons/arrow_right.png">
+            <video id="video1"></video>
+            <video id="video2"></video>
+            <canvas id="pdf_renderer1"></canvas>
+            <canvas id="pdf_renderer2"></canvas>
+            <canvas id="pdf_renderer3"></canvas>
+            <!-- nav mesh-->
+            <!-- <a-asset-item id="main-navmesh" src="museum/assets/navmeshes/navmesh_room3.gltf"></a-asset-item> -->
+    
+        </a-assets>
+        
+        <!--SKY-->
+        <a-sky src="#sky"></a-sky>
+        <!--LIGHT-->
+        <a-entity light="type : ambient; intensity: 1.1; castShadows: true"></a-entity>
+        <a-entity light="castShadow: true; intensity: 0.4" position="2.03218 13.8244 -1.34995"></a-entity>
+        <!--LIGHT-->
+    
+        <!--PLAYER-->
+        <a-entity id="camera-rig" wasd-controls="acceleration: 50" simple-navmesh-constraint="navmesh: #navmesh-el; exclude: .navmesh-hole" position="0 1 -1" rotation="0 80 0" data-aframe-inspector-original-camera="">
+            <a-entity camera id="head" look-controls="pointerLockEnabled: true" position="0 1.6 0">
+                <a-cursor material="" raycaster="" cursor="" geometry=""></a-cursor>
+        </a-entity>
+    
+    
+        <!--ROOM AREA CONSTRAINT-->
+        <a-plane id="navmesh-el" position="0 0 0" rotation="-90 0 0" src="#floor" normal-map="#floor-NRM" normal-texture-repeat="1 1" normal-scale="1 -1" roughness="0.3" width="10" height="10" visible="false"></a-plane>
+        <!--FLOOR CONSTRAINT-->
+        <a-plane rotation="-90 0 0" width="1.5" height="0.6" class="navmesh-hole" visible="false" material="" geometry=""></a-plane>
+        
+        <!--BUILDING-->      
+        <a-entity>
+            <!--FLOOR-->
+            <a-plane id="floor" position="" rotation="-90 0 0" src="#floor" normal-map="#floor-NRM" normal-texture-repeat="1 1" normal-scale="1 -1" roughness="0.3" width="10" height="10" material="" geometry="width: 20; height: 20" visible=""></a-plane>
+    
+            <!--WALLS-->
+            <a-box src="#wall" repeat="1 1" normal-map="#wall-NRM" normal-texture-repeat="1 1" normal-scale="1 -1" roughness="0.3" position="5 2 0" rotation="0 90 0" scale="" material="" geometry="depth: 0.1; height: 4; width: 10" visible="true" id="wall1"></a-box>
+            <a-box src="#wall" repeat="1 1" normal-map="#wall-NRM" normal-texture-repeat="1 1" normal-scale="1 -1" roughness="0.3" position="-5 2 0" rotation="0 90 0" scale="" material="" geometry="depth: 0.1; height: 4; width: 10" visible="" id="wall2"></a-box>
+            <a-box src="#wall" repeat="1 1" normal-map="#wall-NRM" normal-texture-repeat="1 1" normal-scale="1 -1" roughness="0.3" position="0 2 5" rotation="" scale="" material="" geometry="depth: 0.1; height: 4; width: 10" visible="" id="wall3"></a-box>
+            <a-box src="#wall" repeat="1 1" normal-map="#wall-NRM" normal-texture-repeat="1 1" normal-scale="1 -1" roughness="0.3" position="0 2 -5" rotation="" scale="" material="" geometry="depth: 0.1; height: 4; width: 10" visible="" id="wall4"></a-box>
+    
+            <!--DOOR-->
+            <a-entity id="door" shadow="" gltf-model="museum/assets/models/door/scene.gltf" position="-4.9 0 0" rotation="0 90 0" scale="1.3 1.3 1">
+                <a-box id="openInteractiv" shadow="" position="0.08161 1.02017 0" rotation="0 90 0" scale="0.30042 2.08234 1" material="opacity: 0; transparent: true" interactive="" geometry=""></a-box>
+            </a-entity>
+        </a-entity>
+           
+    
+        <!--ITEM1--> <!--JN-25-->
+        <a-entity gltf-model="museum/assets/models/frame.gltf" position="4.9 0 0" rotation="" id="showcase1">
+            <a-image id="item1" rotation="0 90 0" position="0 2.22216 -0.71049" material="" geometry="height: 1.76; width: 1.4"></a-image>
+            <a-troika-text color="black" id="text1" troika-text="letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 4; font: ; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify; value: The JN-25 cipher was a prominent Japanese naval code used during World War II, primarily for communication between the Imperial Japanese Navy and its fleet. Invented in the late 1930s, JN-25 consisted of a codebook and an additive component. The codebook contained five-digit numbers representing words, phrases, or characters, while the additive component consisted of a series of random numbers. To encrypt a message, the plaintext was first encoded using the codebook, then the additive component was applied in a modulo-3 fashion. JN-25 underwent multiple revisions to maintain security throughout the war.." rotation="0 -90 0" position="0 1.78363 0"></a-troika-text>
+        </a-entity>
+        <!--ITEM1-->
+    
+        <!--ITEM2--> <!--I-RO-HA-->
+        <a-entity gltf-model="museum/assets/models/frame.gltf" position="3.01086 0 0" rotation="" id="showcase2">
+            <a-image id="item2" rotation="0 90 0" position="0 2.22216 -0.71049" material="" geometry="height: 1.76; width: 1.4"></a-image>
+            <a-troika-text color="black" id="text2" troika-text="letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 4; font: ; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify; value: The I-RO-HA (checkerboard) cipher is a Japanese cryptographic system based on the traditional Iroha ordering of Japanese syllables. Invented in the 16th century, it employs a 7x7 grid filled with 48 unique Japanese syllables (one space blank) derived from the Iroha poem. To encrypt a message, each syllable is replaced with its corresponding row and column coordinates from the grid. The checkerboard cipher is a simple substitution cipher that can be vulnerable to frequency analysis. To crack the cipher, codebreakers would analyze syllable frequency in the ciphertext and compare it to the known frequency of syllables in the Japanese language, eventually deducing the grid arrangement." rotation="0 -90 0" position="0 1.78363 0"></a-troika-text>
+        </a-entity>
+        <!--ITEM2-->
+    
+        <!--ITEM3--> <!--THE RED BOOK-->
+        <a-entity gltf-model="museum/assets/models/frame.gltf" position="" rotation="" id="showcase3">
+            <a-image id="item3" rotation="0 90 0" position="0 2.22216 -0.71049" material="" geometry="height: 1.76; width: 1.4"></a-image>
+            <a-troika-text color="black" id="text3" troika-text="letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 4; font: ; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify; value: The Japanese Red Book cipher was a diplomatic code employed by Japan before and during World War II. Developed in the 1930s, it utilized a codebook of groups of numbers representing syllables in the Japanese language. To encrypt messages, plaintext syllables were substituted with corresponding number groups from the codebook. The Red Book cipher was a simple substitution cipher vulnerable to frequency analysis. Allied codebreakers successfully cracked the cipher, gaining valuable intelligence throughout the war. The Japanese later replaced the Red Book cipher with more advanced systems, such as the Purple cipher, to enhance security." rotation="0 -90 0" position="0 1.78363 0"></a-troika-text>
+        </a-entity>
+        <!--ITEM3-->
+    
+        <!--ITEM4--> <!--THE BLUE BOOK-->
+        <a-entity gltf-model="museum/assets/models/frame.gltf" position="" rotation="" id="showcase4">
+            <a-image id="item4" rotation="0 90 0" position="0 2.22216 -0.71049" material="" geometry="height: 1.76; width: 1.4"></a-image>
+            <a-troika-text color="black" id="text4" troika-text="letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 4; font: ; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify; value: The Blue Book code, which was a Japanese cryptographic system discovered by U.S. cryptanalysts in September 1931. The code consisted of groups of four Kana symbols instead of three, like its predecessor, the Red Book code. The Blue Book code was more complex, involving two transpositions—one simple and the other more sophisticated, using columnar transposition with nulls and blanks. The Blue Code was discontinued around June 1939 or October 1938, consistent with Nuboer's memoirs, which mention that the work on the '.' code continued until he left for the Netherlands in the summer of 1938." rotation="0 -90 0" position="0 1.78363 0"></a-troika-text>
+        </a-entity>
+        <!--ITEM4-->
+    
+        <!--ITEM5--> <!--Type B Cipher machine-->
+        <a-entity gltf-model="museum/assets/models/frame.gltf" position="" rotation="" id="showcase5">
+            <a-image id="item5" rotation="0 90 0" position="0 2.22216 -0.71049" material="" geometry="height: 1.76; width: 1.4"></a-image>
+            <a-troika-text color="black" id="text5" troika-text="letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 4; font: ; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify; value: The System 97 Typewriter for European Characters, or Type B Cipher Machine (codenamed Purple by the US), was an electromechanical encryption machine used by the Japanese Foreign Office from February 1939 to the end of World War II. Replacing the Type A Red machine, it encrypted sensitive diplomatic traffic using stepping-switches and the 26-letter English alphabet for telegraphy. The 26-letters were separated into groups of six and twenty, each scrambled differently. The US Army Signals Intelligence Service (SIS) cracked the sixes group early on, while the twenties group was deciphered in September 1940, enabling them to build a machine that duplicated the Japanese machines behavior. The Japanese also used stepping-switch systems like Coral and Jade without dividing their alphabets."; rotation="0 -90 0" position="0 1.78363 0"></a-troika-text>
+        </a-entity>
+        <!--ITEM5-->
+
+        <!--ITEM6--> <!--Type A Cipher machine-->
+        <a-entity gltf-model="museum/assets/models/frame.gltf" position="" rotation="" id="showcase5">
+            <a-image id="item5" rotation="0 90 0" position="0 2.22216 -0.71049" material="" geometry="height: 1.76; width: 1.4"></a-image>
+            <a-troika-text color="black" id="text5" troika-text="letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 4; font: ; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify; value: The Type A Cipher Machine, codenamed Red, was a diplomatic cryptographic machine used by the Japanese Foreign Office before and during World War II. It encrypted and decrypted Latin character texts for transmission through cable services. The Red machine produced telegraph code by encrypting vowels separately from consonants to create pronounceable words, which were charged a lower rate. This sixes and twenties effect was a major weakness. Encryption was provided through a single half-rotor with sixty contacts, separating vowels and consonants using wiring and a plugboard. The rotor turned at least one step after each letter, with rotation controlled by a break wheel with removable pins. This irregular pattern of rotation produced an Alberti cipher. The Red cipher was succeeded by the more advanced Type B Purple machine, which used some of the same principles."; rotation="0 -90 0" position="0 1.78363 0"></a-troika-text>
+        </a-entity>
+        <!--ITEM6-->
+    
+        <!--PDF1-->
+        <a-entity>
+            <a-entity id="kiosk"  gltf-model="#kiosk" position="1.07908 -1.72651 -4.47078" rotation="" scale="0.2 0.2 0.2"></a-entity>
+            <a-entity id="pdf1" geometry="primitive: plane; height: 1.88; width: 1.15" position="1.08029 1.775 -4.234" material="src: #pdf_renderer1"></a-entity>
+            <a-box id="block" shadow=""  position="1.09673 1.34623 -4.71936" rotation="0 90 0" scale="0.09278 2.11912 -1.05479" material="opacity: 0; transparent: true"></a-box>
+            <a-image id="markerUp1" src="#marker" rotation="" position="1.77277 1.81607 -4.228" scale="0.1 0.1 0.1"></a-image>
+            <a-image id="markerDown1" src="#marker" rotation="0 0 179.9998479605043" position="0.40263 1.816 -4.22792" scale="0.1 0.1 0.1"></a-image>
+            <a-troika-text color="black" id="currentPage1" troika-text="value: 1; letterSpacing: 0.2; lineHeight: 2.25; maxWidth: 3; font: ; outlineWidth: 0.005; anchor: left; fontSize: 0.1; align: justify" rotation="" position="1.04033 2.84756 -4.22747"></a-troika-text>
+        </a-entity>
+        <!--PDF1-->
+    
+        
+    
+    
+    
+        </a-scene>
+
+
+
+</body>
+<footer>
+
+    
 
 </footer>
 

@@ -23,7 +23,8 @@
             currentPage: 1,
             usedObject: "#pdf1",
             usedCanvas : "pdf_renderer1",
-            zoom: 5
+            zoom: 5,
+            pageRendering : false
         };
 
         var myState2 = {
@@ -94,7 +95,11 @@
                 });
                 first = true;
             }
+            
             return;
+
+
+
             if(obj.item_number === "11"){
 //             console.log("Dostanem sa sem 11");
                 AFRAME.registerComponent('render-pdf', {
@@ -189,57 +194,75 @@
         };
 
         function render(myState) {
-            myState.pdf.getPage(myState.currentPage).then(page => {
+            if (!myState.pageRendering) {
+                myState.pageRendering = true;
+            
+                myState.pdf.getPage(myState.currentPage).then(page => {
 
-                var planeEl = document.querySelector(myState.usedObject);
-                var canvas = document.getElementById(myState.usedCanvas);
-                var ctx = canvas.getContext("2d");
-                var viewport = page.getViewport(myState.zoom);
+                    var planeEl = document.querySelector(myState.usedObject);
+                    var canvas = document.getElementById(myState.usedCanvas);
+                    var ctx = canvas.getContext("2d");
+                    var viewport = page.getViewport(myState.zoom);
 
 
-                console.log("height  " + viewport.height);
-                console.log("width" + viewport.width);
-                canvas.width = viewport.width;
-                canvas.height = viewport.height;
+                    console.log(myState.currentPage);
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
 
-                var renderTask = page.render({
-                    canvasContext: ctx,
-                    viewport: viewport
+                    /*if (myState.renderTask) {
+                        myState.renderTask.cancel();
+                    }*/
+
+                    var renderTask = page.render({
+                        canvasContext: ctx,
+                        viewport: viewport
+                    });
+
+                    renderTask.promise.then(function () {
+                        myState.pageRendering = false;
+                        /*if (myState.pageNumPending !== null) {
+                            render(myState);
+                            myState.pageNumPending = null;
+                        }*/
+                        planeEl.getObject3D('mesh').material.map.needsUpdate = true;
+                    });
+
                 });
-
-                renderTask.promise.then(function () {
-                    planeEl.getObject3D('mesh').material.map.needsUpdate = true;
-                });
-
-            });
+            }
         }
 
         window.addEventListener("DOMContentLoaded", () => {
 
         document.querySelector('#markerDown1').addEventListener('click', function () {
-            if(myState.pdf == null|| myState.currentPage === 1)
+            if(myState.pdf == null|| myState.currentPage <= 1)
                 return;
-            myState.currentPage -= 1;
-            document.querySelector('#currentPage1').setAttribute('troika-text', 'value: '+ myState.currentPage);
-            render(myState);
+            if (!myState.pageRendering) {
+                myState.currentPage -= 1;
+                document.querySelector('#currentPage1').setAttribute('troika-text', 'value: '+ myState.currentPage);
+                render(myState);
+            }
         });
 
 
 
         document.querySelector('#markerUp1').addEventListener('click', function () {
-            if(myState.pdf == null || myState.currentPage > myState.pdf._pdfInfo.numPages)
+            if(myState.pdf == null || myState.currentPage >= myState.pdf._pdfInfo.numPages )
                 return;
-            myState.currentPage += 1;
-            document.querySelector('#currentPage1').setAttribute('troika-text', 'value: '+ myState.currentPage);
-            render(myState);
+            if (!myState.pageRendering) {
+                myState.currentPage += 1;
+                document.querySelector('#currentPage1').setAttribute('troika-text', 'value: '+ myState.currentPage);
+                render(myState);
+            }
         });
 
         document.querySelector('#markerDown2').addEventListener('click', function () {
             if(myState2.pdf == null|| myState2.currentPage === 1)
                 return;
-            myState2.currentPage -= 1;
-            document.querySelector('#currentPage2').setAttribute('troika-text', 'value: '+ myState2.currentPage);
-            render(myState2);
+            if (!myState2.pageRendering) {
+                myState2.currentPage -= 1;
+                document.querySelector('#currentPage2').setAttribute('troika-text', 'value: '+ myState2.currentPage);
+                render(myState2);
+            }
         });
 
         document.querySelector('#markerUp2').addEventListener('click', function () {
